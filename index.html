@@ -182,8 +182,63 @@
         </div>
         <button onclick="openWhatsApp()">פתח WhatsApp</button>
         <button id="addToHomeScreenBtn">הוסף לדף הבית</button>
-        <div class="bubbles">
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class
+    </div>
+    <div class="success-message" id="successMessage">הוסף בהצלחה לדף הבית!</div>
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <script>
+        function openWhatsApp() {
+            const phoneNumber = document.getElementById('phoneNumber').value.replace(/\D/g,'');
+            if (phoneNumber) {
+                const whatsappUrl = `https://wa.me/972${phoneNumber.substring(1)}`;
+                window.open(whatsappUrl, '_blank');
+            } else {
+                alert('אנא הזן מספר טלפון תקין');
+            }
+        }
+
+        let deferredPrompt;
+        const addToHomeScreenBtn = document.getElementById('addToHomeScreenBtn');
+        const successMessage = document.getElementById('successMessage');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            addToHomeScreenBtn.style.display = 'inline-block';
+        });
+
+        addToHomeScreenBtn.addEventListener('click', (e) => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        successMessage.classList.add('show');
+                        setTimeout(() => {
+                            successMessage.classList.remove('show');
+                        }, 3000);
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert('האפשרות להוסיף לדף הבית לא זמינה כרגע. נסה לטעון מחדש את הדף או להשתמש בדפדפן אחר.');
+            }
+        });
+
+        // הוספת מספרים אקראיים של בועות
+        const bubblesContainer = document.querySelector('.bubbles');
+        for (let i = 0; i < 10; i++) {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            bubble.style.left = `${Math.random() * 100}%`;
+            bubble.style.width = bubble.style.height = `${Math.random() * 30 + 10}px`;
+            bubble.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            bubble.style.animationDelay = `${Math.random() * 5}s`;
+            bubblesContainer.appendChild(bubble);
+        }
+    </script>
+</body>
+</html>
